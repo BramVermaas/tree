@@ -7,11 +7,11 @@
 # dus root.leftArm.leftHand.leftPinky
 # ipv root.find_child('leftArm').find_child('leftHand')
 
-import walktree
-import treesettings
-import validtree
-import findtree
-import ordertree
+import traversers
+import settings
+import validators
+import pickers
+import organizers
 
 class Tree(object):
     '''A composite data structure that represents hierarchical relations'''
@@ -34,12 +34,12 @@ class Tree(object):
     @property
     def children(self):
         '''returns iterator with children of tree'''
-        return walktree.ChildTraverser(self)
+        return traversers.ChildTraverser(self)
 
     @children.setter
     def children(self, children):
         '''sets children for this tree'''
-        self._children = validtree.ChildValidator(self, children).items
+        self._children = validators.ChildValidator(self, children).items
 
         for child in self._children:
             if not child.parent == self:
@@ -47,7 +47,11 @@ class Tree(object):
 
     def add_children(self, children):
         '''appends provided tree to children or extends it with provided list'''
-        self.children = self._children + validtree.ChildValidator(self, children).items
+        self.children = self._children + validator.ChildValidator(self, children).items
+        
+    def remove_children(self, children):
+        # moet dit by name, of heb je echt de tree zelf nodig?
+        pass
 
     #parent methods
     @property
@@ -99,23 +103,23 @@ class Tree(object):
     @property
     def settings(self):
         # wel zorgen dat alleen een root object de settings heeft
-        return treesettings.TreeSettings()
+        return settings.TreeSettings()
 
     @property
     def find(self):
-        return findtree.TreeFinder()
+        return pickers.TreePicker()
 
     @property
     def sort(self):
-        return ordertree.TreeSorter()
+        return organizers.TreeSorter()
 
     @property
     def reverse(self):
-        return ordertree.TreeReverser()
+        return organizers.TreeReverser()
 
     @property
     def view(self):
-        return viewtree.TreeViewer()
+        return viewers.TreeViewer()
 
 
     # magic methods
