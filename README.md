@@ -1,52 +1,69 @@
 # Tree
-Composite design pattern for python
+Composite design pattern for python.
 
 ## Usage
-Tree objects can be used to represent any kind of hierarchical data. From folder structures, family trees to bone chains in a 3d package.
+Tree objects can be used to represent any kind of hierarchical data. For example: folder structures or bone chains in a 3d package.
 It provides convient methods for searching and manipulating your hierarchy structure.
 
-### creation:
+### Creation:
 Instantiating a tree object:
 ```python
 import tree
-mytree = tree.Tree('my tree')
+my_tree = tree.Tree('my tree')
 ```
 
-### children and parents:
- - A tree object can have multiple children, but has a maximum of 1 parent.
- - Setting tree 'A' as a child of 'B' will automatically make 'B' the parent of 'A'
- - The reverse is also true: setting 'A' as a parent of 'B' will add 'B' to the children of 'A'
+### Setting children and parents:
+ - A tree object can have multiple children.
+ - But it has a maximum of 1 parent.
+ - Setting tree 'A' as a child of 'B' will automatically make 'B' the parent of 'A'.
+ - The reverse is also true, setting 'A' as a parent of 'B' will add 'B' to the children of 'A'.
+ - When setting, adding or removing children, you can provide either a single tree, list of trees or an tree iterator
 
-Setting children can be achieved with creation arguments:
+Setting children can be achieved with constructor arguments:
 ```python
-mychild = tree.Tree('my child')
-mytree = tree.Tree('my tree', children = mychild)
+b = tree.Tree('B')
+a = tree.Tree('A', children = b)
 ```
 ```python
-mytree = tree.Tree('my tree')
-mychild = tree.Tree('my child', parent = mytree)
+a = tree.Tree('A')
+b = tree.Tree('B', parent = a)
 ```
 
 Or by setting the appropriate attribute:
 ```python
-mychild = tree.Tree('my child')
-mytree.children = mychild
+a = tree.Tree('A')
+b = tree.Tree('B')
+a.children = b
 ```
 ```python
-mychild = tree.Tree('my child')
-mychild.parent = mytree
+a = tree.Tree('A')
+b = tree.Tree('B')
+b.parent = a
 ```
 
-
-Adding additional children can also be done in 2 ways:
+Adding additional children:
 ```python
-mychild2 = tree.Tree('my child 2', parent = mytree)
+c = tree.Tree('C')
+a.add_children(c)
 ```
+Removing children:
 ```python
-mychild2 = tree.Tree('my child 2')
-mytree.add_children = mychild2
+a.remove_children(b)
 ```
 
+### Getting children and parents:
+ - Tree children are returned as a ChildTraverser object which is an iterator containing the children
+ - A tree parent is returned as a single tree object (since there can only be 1)
+ 
+getting children:
+```python
+a.children
+``` 
+
+getting parent:
+```python
+c.parent
+``` 
 
 ## Inherritance
 
