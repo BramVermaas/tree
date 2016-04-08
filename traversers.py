@@ -1,17 +1,3 @@
-'''The walktree module contains iterators that encapsulate different traversal algorithms for Tree objects
-
-
-
-All new traverser must:
-- must be a subclass of AbstractTravers
-- must implement the domain property
-- must implement the init_stack method
-- must implement the next method
-'''
-
-# als filter_phase = 'pre_traversal', dan krijgt een traverser zelf de filter objecten (van de TreeIterator)
-# zodat hij zelf kan filteren voordat hij de elementen uitspuugd 
-# (en dus items die niet door de filter heenkomen, niet verder doorzoekt)
 
 import itertools
 import abc

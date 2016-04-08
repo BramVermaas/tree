@@ -1,12 +1,3 @@
-# key function notes:
-#   Tree class should stay focussed (it's a data structure, should be clean of traversal functionality)
-#   it should be easy to add new traversal methods
-
-# ik wil de tree data structure scheiden van de interface
-# als ik dan een wil aanspreken op een andere manier (bijvoorbeeld met de . notatie)
-# dus root.leftArm.leftHand.leftPinky
-# ipv root.find_child('leftArm').find_child('leftHand')
-
 import traversers
 import settings
 import validators
@@ -30,7 +21,8 @@ class Tree(object):
         '''sets tree name '''
         self._name = unicode(name)
 
-    #children methods
+        
+        
     @property
     def children(self):
         '''returns iterator with children of tree'''
@@ -50,10 +42,10 @@ class Tree(object):
         self.children = self._children + validator.ChildValidator(self, children).items
         
     def remove_children(self, children):
-        # moet dit by name, of heb je echt de tree zelf nodig?
         pass
 
-    #parent methods
+        
+        
     @property
     def parent(self):
         '''returns parent of tree'''
@@ -66,43 +58,14 @@ class Tree(object):
         if parent and not self in parent.children:
             parent.add_children(self)
 
-    # characteristic attributes
+
+        
     @property
-    def is_leaf(self):
-        '''returns True if tree has no children'''
-        if not self._children:
-            return True
-        return False
-
-    @property
-    def is_root(self):
-        '''returns True if tree has no parents'''
-        if not self._parents:
-            return True
-        return False
-
-    @property
-    def is_branch(self):
-        '''returns True if tree has children and parents'''
-        if not self.is_root and not self.is_leaf:
-            return True
-        return False
-
-    @property
-    def depth(self):
-        '''returns number of parents between this tree and root '''
-        return len( list(self.descendants) )
-
-    @property
-    def height(self):
-        '''returns number of parents between this tree and deepest leaf node'''
-        return len( list(self.ancestors) )
-
-
-    # advanced methods
+    def traits(self):
+        return traits.TreeTraits(self)
+    
     @property
     def settings(self):
-        # wel zorgen dat alleen een root object de settings heeft
         return settings.TreeSettings()
 
     @property
@@ -122,7 +85,7 @@ class Tree(object):
         return viewers.TreeViewer()
 
 
-    # magic methods
+        
     def __repr__(self):
         ''' returns "Tree('name') '''
         return "Tree('{name}')".format(name = self.name)

@@ -25,3 +25,5 @@ class abstract_filter(object):
     @abc.abstractproperty
     def characteristic(self):
         raise NotImplementedError
+
+        

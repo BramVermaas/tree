@@ -10,61 +10,61 @@ class ChildValidator(object):
 
         self._check_items_type()
         self._check_for_circular_hierarchy()
+        self._check_for_identical_items()
+        self._check_for_identical_children()
+        
 
-    def _cast_to_list(self, item):
-        '''returns item as a list'''
-        if not type(item) == list:
-            if not item:
-                item = []
-            if isinstance(item, collections.Iterable):
-                item = list(item)
+    def _cast_to_list(self, items):
+        '''returns items as a list'''
+        if not type(items) == list:
+            if not items:
+                items = []
+            if isinstance(items, collections.Iterable):
+                items = list(items)
             else:
-                item = [item]
-        return item
+                items = [items]
+        return items
 
     def _check_items_type(self):
-        '''raise error if  is not of type Tree or subclass of Tree class'''
+        '''raise error if any item is not of type Tree class or subclass'''
         for item in self.items:
             if not issubclass(type(item), tree.Tree):
-                raise TypeError('Unexpected Tree child type: ' +
-                                '{item_type}. '.format(item_type = type(item)) +
-                                'Only Tree instances or ' +
-                                'subclasses of Tree class are allowed.')
+                raise TypeError('{tree} is trying to add the child: {item} ' \  
+                                'with unexpected type: {item_type}. ' \
+                                'Only an instance of the Tree class or its subclasses ' \
+                                'are allowed as children.' \
+                                .format(tree = self.tree, item = item, item_type = type(item)))
 
 
     def _check_for_circular_hierarchy(self):
-        '''raise error if items contains the tree itself'''
-        if self.tree in self.items:
-            raise ValueError( '{tree} is trying to add itself as a child.'.format(
-                              tree = self.tree) +
-                              ' Circular hierarchies are not allowed.')
+        '''raise error if any item has the same identity as the tree itself'''
+        if [i for i in self.items if i is self.tree]:
+            raise ValueError( '{tree} is trying to add itself as a child. ' \
+                              'Circular hierarchies are not allowed.' \
+                              .format(tree = self.tree))
 
-    # een circular dependency kan alleen onstaan als:
-        # het item een parent heeft
-        # zowel het item als de tree dezelfde root hebben
+                    
+    def _check_for_identical_items(self):
+        '''raise error if items contains trees with the same identity'''
+        checked_items = []
+        for item in self.items:
+            if [c for c in checked_items if c is item]:
+                raise ValueError('{tree} is trying to add multiple children ' \
+                                 'in which several copies of {item} ' \
+                                 'have the same identity. ' \
+                                 .format(tree = self.tree, item = item))
+            checked_items.append(item)
+            
+    def _check_for_identical_children(self):
+        '''raise error if items contains trees with the same identity as existing children'''
+        if self.tree.children:
+            for item in self.items:
+                if [c for c in self.tree.children if c is item]:
+                    raise ValueError('{item} is allready a child of {tree}. ' \
+                                     'Children with the same identity are not allowed.' 
+                                     .format(item = item, tree = self.tree))
+            
 
-    #def _check_for_multiple_parents(self):
-    #    '''raise error if items allready have parents'''
-    #    for item in self.items:
-    #        if item.parent:
-    #            raise ValueError( '{item} allready has a parent: {parent}.'.format(
-    #                              item = item, parent = item.parent) +
-    #                              ' Multiple parents are not allowed.')
 
 
 
-
-class TraversalValidator(object):
-    def __init__(self, traversal_order = ''):
-        self.traversal_order = traversal_order
-
-    def check_traversal_order(self):
-        traversal_order_type = type(self.traversal_order)
-        if not traversal_order_type == str:
-            raise TypeError('Unexpected traversal order type: ' \
-                            '{traversal_type}. Can only be of type str.'.format(
-                            traversal_type = traversal_order_type))
-        if not self.traversal_order in ['depth', 'width']:
-            raise ValueError("Unexpected traversal order value: {traversal_order}." \
-                             "Allowed values are only 'depth' or 'width.'".format(
-                             traversal_order = self.traversal_order))
