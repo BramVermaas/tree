@@ -1,12 +1,17 @@
-import traversers
 import settings
-import validators
-import pickers
-import organizers
+import validator
+import picker
+import traits
+import organizer
+import converter
 
 class Tree(object):
     '''A composite data structure that represents hierarchical relations'''
     def __init__(self, name='', children = [], parent = None):
+        self._name = ''
+        self._children = []
+        self._parent = None
+        
         self.name = name
         self.children = children
         self.parent = parent
@@ -19,32 +24,29 @@ class Tree(object):
     @name.setter
     def name(self, name):
         '''sets tree name '''
-        self._name = unicode(name)
+        self._name = self.name_validator.validate(name)
 
-        
         
     @property
     def children(self):
         '''returns iterator with children of tree'''
-        return traversers.ChildTraverser(self)
+        return iter(self._children)
 
     @children.setter
     def children(self, children):
         '''sets children for this tree'''
-        self._children = validators.ChildValidator(self, children).items
-
-        for child in self._children:
-            if not child.parent == self:
-                child.parent = self
+        new_children = self.child_validator.validate(children)
+        self._change_lineage(new_parent = self, children = new_children)
 
     def add_children(self, children):
         '''appends provided tree to children or extends it with provided list'''
-        self.children = self._children + validator.ChildValidator(self, children).items
+        self.children = self._children + self.child_validator.validate(children, is_additional = True)
         
     def remove_children(self, children):
-        pass
+        '''removes provided tree from children or removes the provided list of children'''
+        children_to_remove = self.child_validator.validate(children)
+        self._children = [c for c in self._children if not c in children_to_remove]
 
-        
         
     @property
     def parent(self):
@@ -54,11 +56,42 @@ class Tree(object):
     @parent.setter
     def parent(self, parent):
         '''sets parent of tree'''
-        self._parent = parent
-        if parent and not self in parent.children:
-            parent.add_children(self)
-
-
+        parent = self.parent_validator.validate(parent)
+        self._change_lineage(new_parent = parent, children = [self])
+    
+    
+    
+    def _change_lineage(self, new_parent, children):
+        '''Performs all necesarry attribute updates for changing parent or children'''
+        if new_parent:
+            old_parent = new_parent.parent
+        
+        
+        for child in children:
+            old_parent = adoptee.parent
+            
+            
+            if old_parent != new_parent:
+                if old_parent:
+                    old_parent._children.remove(child)
+                child._parent = new_parent
+        
+        if new_parent:        
+            new_parent._children = children
+            
+        
+    
+    @property
+    def name_validator(self):
+        return validator.NameValidator(self)
+        
+    @property
+    def child_validator(self):
+        return validator.ChildValidator(self)
+        
+    @property
+    def parent_validator(self):
+        return validator.ParentValidator(self)
         
     @property
     def traits(self):
@@ -66,23 +99,32 @@ class Tree(object):
     
     @property
     def settings(self):
-        return settings.TreeSettings()
+        return settings.TreeSettings(self)
 
     @property
     def find(self):
-        return pickers.TreePicker()
+        return picker.TreePicker(self)
 
     @property
     def sort(self):
-        return organizers.TreeSorter()
+        return organizer.TreeSorter(self)
 
     @property
     def reverse(self):
-        return organizers.TreeReverser()
+        return organizer.TreeReverser(self)
 
+    @classmethod
+    @property
+    def loads(self):
+        return converter.TreeLoader(self)
+    
+    @property
+    def dumps(self):
+        return converter.TreeDumper(self)
+        
     @property
     def view(self):
-        return viewers.TreeViewer()
+        return viewers.TreeViewer(self)
 
 
         

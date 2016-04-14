@@ -1,19 +1,21 @@
-
+class TreeSettings(object):
+    '''Stores settings for tree objects'''
+    def __init__(self, tree):
         self.tree = tree
-        self.default_traversal_order = 'width'
-        self.default_filter_order = 'post_traversal'
+        self.traversal_order = 'width'
+        self.filter_order = 'post_traversal'
 
 
 
     @property
-    def default_traversal_order(self):
+    def traversal_order(self):
         '''returns default traversal method used when getting children'''
-        return self._default_traversal_order
+        return self._traversal_order
 
-    @default_traversal_order.setter
-    def default_traversal_order(self, traversal_order=''):
+    @traversal_order.setter
+    def traversal_order(self, traversal_order=''):
         '''sets default traversal order used when getting descendants'''
-        self._default_traversal_order = traversal_order
+        self._traversal_order = traversal_order
 
     def check_traversal_order(self):
         traversal_order_type = type(self.traversal_order)

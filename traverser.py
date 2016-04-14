@@ -46,24 +46,6 @@ class AbstractTraverser(object):
         raise NotImplementedError
 
 
-class ChildTraverser(AbstractTraverser):
-    '''Iterator that returns tree children'''
-
-    @property
-    def domain(self):
-        '''Returns a dictionary specifying for which arguments the traverser is applicable'''
-        return {'traverse_node_type' : 'children'}
-
-    def init_stack(self):
-        '''Returns the initial stack, to start traversal from'''
-        return self.apply_filters( iter(self.tree._children) )
-
-    def next(self):
-        '''Returns next item from stack'''
-        return self.stack.next()
-
-
-
 class DescendantWidthTraverser(AbstractTraverser):
     '''Iterator that returns tree descendants in width first order '''
     @property

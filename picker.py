@@ -1,6 +1,6 @@
 
 
-import walktree
+import traverser
 
 class TreePicker(object):
     '''Configures a TreeTraverser in requested way employing the strategy pattern'''
