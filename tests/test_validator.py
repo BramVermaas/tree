@@ -31,3 +31,24 @@ class Advanced_SetTreeChildren_Testcase(unittest.Tescase):
         '''Test setting a Tree as it's own child (should raise an error)'''
         with self.assertRaises(ValueError):
             self.a.children = [self.b, self.a]
+            
+    def test_switching_root_tree(self):
+        '''Test switching a child to a tree that was first the root'''
+        # tree('A')
+        #   tree('B')
+        #     tree('C')
+        #        tree('D')
+        
+        # tree('D')
+        #   tree('A')
+        #      tree('B')
+        #        tree('C')
+        
+        print 'test_switching_root_tree'
+        
+        self.d.children = self.a
+        self.assertEqual( child_names(self.d), ['A'])
+        self.assertEqual( child_names(self.a), ['B'])
+        self.assertEqual( child_names(self.b), ['C'])
+        self.assertEqual( child_names(self.c), [])
+            

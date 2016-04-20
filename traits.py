@@ -24,7 +24,7 @@ class TreeTraits(object):
     @property
     def depth(self):
         '''returns number of parents between this tree and root '''
-        return len( list(self.find.descendants) )
+        return len( list(self.tree.find.descendants) )
 
     @property
     def height(self):
