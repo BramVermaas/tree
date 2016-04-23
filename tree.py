@@ -2,7 +2,6 @@
 import abstracttree
 
 import validator
-import settings
 import picker
 import traits
 import organizer
@@ -42,7 +41,7 @@ class Tree(abstracttree.AbstractTree):
 
     def add_children(self, children):
         '''appends provided tree to children or extends it with provided list'''
-        additional_children = self.child_validator.validate_additional(self, children)
+        additional_children = self.tree_validator.validate_additional(self, children)
         self.children = self._children + additional_children
         
     def remove_children(self, children):
@@ -61,10 +60,8 @@ class Tree(abstracttree.AbstractTree):
     
     def _change_relatives(self, new_parent, children):
         '''Performs all necesarry attribute updates for switching parent or children'''
-        children = self.child_validator.validate(new_parent, children)
+        new_parent, children = self.tree_validator.validate(new_parent, children)
         for child in children:
-            new_parent = self.parent_validator.validate(new_parent, child)
-            
             old_parent = child.parent
             if old_parent:
                 old_parent._children.remove(child)
@@ -76,26 +73,28 @@ class Tree(abstracttree.AbstractTree):
             else:
                 new_parent._children = []
 
+    @property
+    def default_traversal_order(self):
+        '''returns default traversal method used when getting children'''
+        return 'depth_first'
+        
+    @property
+    def default_filter_order(self):
+        '''returns default filter order used when getting children'''
+        return 'post_traversal'
+        
                 
     @property
     def name_validator(self):
         return validator.NameValidator()
         
     @property
-    def child_validator(self):
-        return validator.ChildValidator()
-        
-    @property
-    def parent_validator(self):
-        return validator.ParentValidator()
+    def tree_validator(self):
+        return validator.TreeValidator()
         
     @property
     def traits(self):
         return traits.TreeTraits(self)
-    
-    @property
-    def settings(self):
-        return settings.TreeSettings(self)
 
     @property
     def find(self):
@@ -130,8 +129,21 @@ class Tree(abstracttree.AbstractTree):
 
     def __eq__(self, other):
         '''returns whether trees are equal'''
-        return (isinstance(other, self.__class__)
-            and self.__dict__ == other.__dict__)
+        if self and other:
+            matching_type = isinstance(other, self.__class__)
+            matching_name = self.name == other.name
+            
+            self_descendants = [(s.name, type(s)) for s in self.find.descendants_depthfirst()]
+            other_descendants = [(o.name, type(o)) for o in other.find.descendants_depthfirst()]
+            matching_descendants = self_descendants == other_descendants
+            
+            self_ancestors = [(s.name, type(s)) for s in self.find.ancestors()]
+            other_ancestors = [(o.name, type(o)) for o in other.find.ancestors()]
+            matching_ancestors = self_ancestors == other_ancestors
+            
+            return all([matching_type, matching_name, matching_descendants, matching_ancestors])
+        else:
+            return not self and not other
 
     def __ne__(self, other):
         '''returns if trees are unequal'''

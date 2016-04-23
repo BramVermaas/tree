@@ -4,29 +4,14 @@ import traverser
 
 class TreePicker(object):
     '''Configures a TreeTraverser in requested way employing the strategy pattern'''
-    def __init__(self, tree = None, traverse_node_type = 'children',
-                 traverse_order = None, **kwargs):
-
+    def __init__(self, tree):
         self.tree = tree
-        self.traverse_node_type = traverse_node_type
-        self.traverse_order = traverse_order
-        self.filter_args = kwargs
-
-        self.filters = self.init_filters()
 
 
     def init_filters(self):
         '''Returns all available filters'''
         pass
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        return self.traverser.next()
-
        
-
 
     @property
     def siblings(self):
@@ -49,71 +34,41 @@ class TreePicker(object):
 
 
     def child(self, *args, **kwargs):
-        '''returns first child matching specified criteria
-
-        examples:
-
-        .find_child('Bert') -> Tree('Bert')
-        .find_child(predicate= lambda a: '_' in a.name) --> Tree('my_name')
-        '''
+        '''returns first child matching specified criteria'''
         pass
 
 
     def children(self, *args, **kwargs):
-        '''returns list of children matching specified criteria
-
-        examples:
-        .find_children('Bert') -> [Tree('Bert')]
-        .find_children(predicate= lambda a: '_' in a.name) --> [Tree('my_name')]
-        '''
+        '''returns iterator with children matching specified criteria'''
         pass
 
 
     def ancestor(self, *args, **kwargs):
-        '''returns first ancestor matching specified criteria
-
-        examples:
-        .find_ancestor('Bert') -> Tree('Bert')
-        .find_ancestor(level=2) -> Tree('grandparent')
-        .find_ancestor(predicate= lambda a: '_' in a.name) --> Tree('my_name')
-        '''
+        '''returns first parent, grandparent, etc, matching specified criteria'''
         pass
-
 
     def ancestors(self, *args, **kwargs):
-        '''returns list of ancestors matching specified criteria
+        '''returns iterator with parents, grandparents, etc, matching specified criteria'''
+        return traverser.AncestorTraverser(self.tree, args, kwargs)
 
-        examples:
-        .find_ancestors('Bert') -> [Tree('Bert')]
-        .find_ancestors(level=range(1,2)) -> [Tree('parent'), Tree('grandparent')]
-        .find_ancestors(predicate= lambda a: '_' in a.name) --> [Tree('my_name')]
-        '''
         
-        '''returns an iterator with all parents [parent, grandparent, great-grandparent, root]'''
-        return itertree.TreeIterator(self, 'ancestors')
-        pass
-
-
     def descendant(self, *args, **kwargs):
-        '''returns first descendant matching specified criteria
-
-        examples:
-        .find_descendat('Bert') -> Tree('Bert')
-        .find_descendat(level=2) -> [Tree('grandchild1'), Tree('grandchild2')]
-        .find_descendat(predicate= lambda a: '_' in a.name) --> Tree('my_name')
-        '''
-        
-        '''returns a iterator of all children (children, grandchildren, greatgrandchildren etc)'''
-        return itertree.TreeIterator(self, 'descendants', self.default_traversal_order)
-        
-        pass
+        '''returns first child, grandchild, etc, matching specified criteria'''
+        return traverser.DescendantWidthTraverser(self.tree, args, kwargs).next()
 
     def descendants(self, *args, **kwargs):
-        '''returns list of descendants matching specified criteria
-
-        examples:
-        .find_ancestors('Bert') -> [Tree('Bert')]
-        .find_ancestors(level=2) -> [Tree('parent'), Tree('grandparent')]
-        .find_ancestors(predicate= lambda a: '_' in a.name) --> [Tree('my_name')]
-        '''
-        pass
+        '''returns iterator with children, grandchildren, etc, matching specified criteria'''
+        if self.tree.default_traversal_order == 'depth_first':
+            return traverser.DescendantDepthTraverser(self.tree, args, kwargs)
+        if self.tree.default_traversal_order == 'width_first':
+            return traverser.DescendantWidthTraverser(self.tree, args, kwargs)
+        
+    def descendants_widthfirst(self, *args, **kwargs):
+        '''returns iterator with children, grandchildren, etc, matching specified criteria in width first order'''
+        return traverser.DescendantWidthTraverser(self.tree, args, kwargs)
+        
+    def descendants_depthfirst(self, *args, **kwargs):
+        '''returns iterator with children, grandchildren, etc, matching specified criteria in depth first order'''
+        return traverser.DescendantDepthTraverser(self.tree, args, kwargs)
+        
+    

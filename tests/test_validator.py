@@ -1,4 +1,4 @@
-# kan ik tree's wel los testen van traversers en validators?
+
 class Advanced_SetTreeChildren_Testcase(unittest.Tescase):
     def setUp(self):
         self.a = tree.Tree('A')

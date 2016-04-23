@@ -616,6 +616,16 @@ class Add_Children_Testcase(unittest.TestCase):
         self.e.add_children(None)
         self.assertEqual( child_names(self.e), [])
         
+    def add_empty_list_as_child_to_orphan(self):
+        '''Test if adding a empty list to children of a orphan doesn't change children'''
+        self.e.add_children([])
+        self.assertEqual( child_names(self.e), [])
+        
+    def add_empty_iterator_as_child_to_orphan(self):
+        '''Test if adding a empty iterator to children of a orphan doesn't change children'''
+        self.e.add_children(iter([]))
+        self.assertEqual( child_names(self.e), [])
+        
     def add_single_child_to_orphan(self):
         '''Test adding a single child to an orphan'''
         self.e.add_children(tree.Tree('F'))
@@ -633,6 +643,11 @@ class Add_Children_Testcase(unittest.TestCase):
         
     def add_empty_list_as_child_to_branch(self):
         '''Test if adding a empty list to children of a branch doesn't change children'''
+        self.b.add_children([])
+        self.assertEqual( child_names(self.b), ['C'])
+        
+    def add_empty_iterator_as_child_to_branch(self):
+        '''Test if adding a empty iterator to children of a branch doesn't change children'''
         self.b.add_children([])
         self.assertEqual( child_names(self.b), ['C'])
         
@@ -669,7 +684,7 @@ class Add_Children_Testcase(unittest.TestCase):
         self.assertEqual( self.c.parent.name, 'E')
         self.assertEqual( self.d.parent.name, 'E')
         
-    def test_switch_leaf_to_branch(self):
+    def test_add_leaf_to_branch(self):
         '''Test set children equivalent to leaf.parent = branch'''
         # tree('A')
         #   tree('B')
@@ -677,37 +692,43 @@ class Add_Children_Testcase(unittest.TestCase):
         #     tree('D')       
         #     tree('E')
         
-        self.b.children = [self.c, self.d]
+        self.b.add_children([self.d, self.e])
         
         self.assertEqual( child_names(self.a), ['B'])
-        self.assertEqual( child_names(self.b), ['C', 'D'])
+        self.assertEqual( child_names(self.b), ['C', 'D', 'E'])
         self.assertEqual( child_names(self.c), [])
         self.assertEqual( child_names(self.d), [])
+        self.assertEqual( child_names(self.e), [])
         
         self.assertEqual( self.a.parent, None)
         self.assertEqual( self.b.parent.name, 'A')
         self.assertEqual( self.c.parent.name, 'B')
         self.assertEqual( self.d.parent.name, 'B')
+        self.assertEqual( self.e.parent.name, 'B')
         
-    def test_switch_leaf_to_root(self):
+    def test_add_leaf_to_root(self):
         '''Test set children equivalent to leaf.parent = root'''
         # tree('A')
         #   tree('B')
         #     tree('C') 
         #   tree('D')
+        #   tree('E')
         
-        self.a.children = [self.b, self.d]
+        self.a.add_children([self.d, self.e])
         
-        self.assertEqual( child_names(self.a), ['B', 'D'])
+        self.assertEqual( child_names(self.a), ['B', 'D', 'E'])
         self.assertEqual( child_names(self.b), ['C'])
+        self.assertEqual( child_names(self.c), [])
         self.assertEqual( child_names(self.d), [])
+        self.assertEqual( child_names(self.e), [])
         
         self.assertEqual( self.a.parent, None)
         self.assertEqual( self.b.parent.name, 'A')
         self.assertEqual( self.c.parent.name, 'B')
         self.assertEqual( self.d.parent.name, 'A')
+        self.assertEqual( self.e.parent.name, 'A')
         
-    def test_switching_branch_to_orphan(self):
+    def test_add_branch_to_orphan(self):
         '''Test set children equivalent to branch.parent = orphan'''
         # tree('A')
         #   tree('B')
@@ -716,7 +737,7 @@ class Add_Children_Testcase(unittest.TestCase):
         #   tree('C')
         #     tree('D')
 
-        self.e.children = self.c
+        self.e.add_children(self.c)
         
         self.assertEqual( child_names(self.a), ['B'])
         self.assertEqual( child_names(self.b), [])
@@ -730,14 +751,14 @@ class Add_Children_Testcase(unittest.TestCase):
         self.assertEqual( self.c.parent.name, 'E')
         self.assertEqual( self.d.parent.name, 'C')
 
-    def test_switching_branch_to_root(self):
+    def test_add_branch_to_root(self):
         '''Test set children equivalent to branch.parent = root'''
         # tree('A')
         #   tree('B')
         #   tree('C')
         #     tree('D')
         
-        self.a.children = [self.b, self.c]
+        self.a.add_children(self.c)
         
         self.assertEqual( child_names(self.a), ['B', 'C'])
         self.assertEqual( child_names(self.b), [])
@@ -749,7 +770,7 @@ class Add_Children_Testcase(unittest.TestCase):
         self.assertEqual( self.c.parent.name, 'A')
         self.assertEqual( self.d.parent.name, 'C')
 
-    def test_switching_orphan_to_leaf(self):
+    def test_add_orphan_to_leaf(self):
         '''Test set children equivalent to orphan.parent = leaf'''
         # tree('A')
         #   tree('B')
@@ -757,7 +778,7 @@ class Add_Children_Testcase(unittest.TestCase):
         #        tree('D')
         #          tree('E')
         
-        self.d.children = self.e
+        self.d.add_children(self.e)
         
         self.assertEqual( child_names(self.a), ['B'])
         self.assertEqual( child_names(self.b), ['C'])
@@ -771,7 +792,7 @@ class Add_Children_Testcase(unittest.TestCase):
         self.assertEqual( self.d.parent.name, 'C')
         self.assertEqual( self.e.parent.name, 'D')
         
-    def test_switching_orphan_to_branch(self):
+    def test_add_orphan_to_branch(self):
         '''Test set children equivalent to orphan.parent = branch'''
         # tree('A')
         #   tree('B')
@@ -779,7 +800,7 @@ class Add_Children_Testcase(unittest.TestCase):
         #        tree('D')
         #     tree('E')
         
-        self.b.children = [self.c, self.e]
+        self.b.add_children(self.e)
         
         self.assertEqual( child_names(self.a), ['B'])
         self.assertEqual( child_names(self.b), ['C', 'E'])
@@ -793,7 +814,7 @@ class Add_Children_Testcase(unittest.TestCase):
         self.assertEqual( self.d.parent.name, 'C')
         self.assertEqual( self.e.parent.name, 'B')
         
-    def test_switching_orphan_to_root(self):
+    def test_add_orphan_to_root(self):
         '''Test set children equivalent to orphan.parent = root'''
         # tree('A')
         #   tree('B')
@@ -801,7 +822,7 @@ class Add_Children_Testcase(unittest.TestCase):
         #        tree('D')
         #   tree('E')  
         
-        self.a.children = [self.b, self.e]
+        self.a.add_children(self.e)
         
         self.assertEqual( child_names(self.a), ['B', 'E'])
         self.assertEqual( child_names(self.b), ['C'])
@@ -815,7 +836,7 @@ class Add_Children_Testcase(unittest.TestCase):
         self.assertEqual( self.d.parent.name, 'C')
         self.assertEqual( self.e.parent.name, 'A')
         
-    def test_switching_root_to_orphaned_tree(self):
+    def test_add_root_to_orphaned_tree(self):
         '''Test switching a root to a tree that is orphaned'''
         # tree('E')
         #   tree('A')
@@ -823,7 +844,7 @@ class Add_Children_Testcase(unittest.TestCase):
         #       tree('C')
         #          tree('D')
         
-        self.e.children = self.a
+        self.e.add_children(self.a)
         
         self.assertEqual( child_names(self.e), ['A'])
         self.assertEqual( child_names(self.a), ['B'])
@@ -836,14 +857,38 @@ class Add_Children_Testcase(unittest.TestCase):
         self.assertEqual( self.b.parent.name, 'A')
         self.assertEqual( self.c.parent.name, 'B')
         self.assertEqual( self.d.parent.name, 'C')
+        
+    def test_add_flattened_hierarchy_to_orphaned_tree(self):
+        '''Test switching a hierarchy as flat children to a tree that is orphaned'''
+        # tree('E')
+        #   tree('A')
+        #   tree('B')
+        #   tree('C')
+        #   tree('D')
+        
+        self.e.add_children([self.a, self.b, self.c, self.d])
+        
+        self.assertEqual( child_names(self.e), ['A', 'B', 'C', 'D'])
+        self.assertEqual( child_names(self.a), [])
+        self.assertEqual( child_names(self.b), [])
+        self.assertEqual( child_names(self.c), [])
+        self.assertEqual( child_names(self.d), [])
+        
+        self.assertEqual( self.e.parent, None)
+        self.assertEqual( self.a.parent.name, 'E')
+        self.assertEqual( self.b.parent.name, 'E')
+        self.assertEqual( self.c.parent.name, 'E')
+        self.assertEqual( self.d.parent.name, 'E')
  
 
-# complexe scenario's testen waarbij er meerdere tree's van een structuur worden geadd als children bij een andere
+
 
 
 
 
 if __name__ == '__main__':
     unittest.main()
+    
+    
 
 

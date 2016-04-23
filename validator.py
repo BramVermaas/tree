@@ -12,11 +12,13 @@ class AbstractValidator(object):
 
 class NameValidator(AbstractValidator):
     '''Validates and prepares name before use by Tree'''
+    __metaclass__ = abc.ABCMeta
+    
     def validate(self, name):
         return name
 
         
-class ChildValidator(AbstractValidator):
+class TreeValidator(AbstractValidator):
     '''Validates and prepares children before use by parent'''
 
     def validate(self, parent, children):
@@ -25,12 +27,14 @@ class ChildValidator(AbstractValidator):
         self.children = self.cast_to_list(children)
         
         self.check_children_type()
+        self.check_parent_type()
         self.check_for_child_self_refrence()
         self.check_for_duplicate_children()
+        self.check_for_ancestors_in_children()
         
-        return self.children
+        return self.parent, self.children
         
-    def validate_aditional(self, parent, children):
+    def validate_additional(self, parent, children):
         '''Returns validated additonal Tree children'''
         self.parent = parent
         self.children = self.cast_to_list(children)
@@ -53,17 +57,26 @@ class ChildValidator(AbstractValidator):
         '''raise error if any child is not of type AbstractTree or subclass'''
         for child in self.children:
             if not issubclass(type(child), abstracttree.AbstractTree):
-                raise TypeError('{parent} is trying to add or remove the child: {child} ' \
+                raise TypeError('{parent} is trying to add the child: {child} ' \
                                 'with unexpected type: {child_type}. ' \
                                 'Only an instance of the AbstractTree class or its subclasses ' \
                                 'are valid children.' \
                                 .format(parent = self.parent, child = child, child_type = type(child)))
 
 
+    def check_parent_type(self):
+        '''raise error if parent is not of type AbstractTree or subclass'''
+        if self.parent and not issubclass(type(self.parent), abstracttree.AbstractTree):
+            raise TypeError('{child} is trying to set as parent: {parent} ' \
+                            'with unexpected type: {parent_type}. ' \
+                            'Only an instance of the AbstractTree class or its subclasses ' \
+                            'is a valid parent.'.format(parent = self.parent, 
+                            child = self.children[0], parent_type = type(self.parent)))                           
+                                
     def check_for_child_self_refrence(self):
         '''raise error if any child has the same identity as the parent itself'''
         if [c for c in self.children if c is self.parent]:
-            raise ValueError( '{parent} is trying to add or remove itself as a child. ' \
+            raise ValueError( '{parent} is trying to add itself as a child. ' \
                               'Circular hierarchies are not allowed.' \
                               .format(parent = self.parent))
 
@@ -73,7 +86,7 @@ class ChildValidator(AbstractValidator):
         checked_children = []
         for child in self.children:
             if [c for c in checked_children if c.name == child.name]:
-                raise ValueError('{parent} is trying to add or remove multiple children ' \
+                raise ValueError('{parent} is trying to add multiple children ' \
                                  'in which one or more copies of {child} ' \
                                  'have the same name. ' \
                                  'Children with the identical names are not allowed.' \
@@ -88,23 +101,16 @@ class ChildValidator(AbstractValidator):
                     raise ValueError('{child} is allready a child of {parent}. ' \
                                      'Children with the identical names are not allowed.' 
                                      .format(child = parent_child, parent = self.parent))
+                                     
+    def check_for_ancestors_in_children(self):
+        '''raise error if children contains a tree that is an ancestor of the parent tree'''
+        if self.parent:
+            for ancestor in self.parent.find.ancestors():
+                if ancestor in self.children:
+                    raise ValueError( "{parent} is trying to add it's ancestor: {ancestor} " \
+                                      "as a child. Circular hierarchies are not allowed." \
+                                      .format(parent = self.parent, ancestor = ancestor))
             
 
-class ParentValidator(AbstractValidator):
-    def validate(self, parent, child):
-        self.parent = parent
-        self.child = child
-        
-        self.check_parent_type()
-        return parent
-
-    def check_parent_type(self):
-        '''raise error if parent is not of type AbstractTree or subclass'''
-        if self.parent and not issubclass(type(self.parent), abstracttree.AbstractTree):
-            raise TypeError('{child} is trying to set as parent: {parent} ' \
-                            'with unexpected type: {parent_type}. ' \
-                            'Only an instance of the AbstractTree class or its subclasses ' \
-                            'is a valid parent.'.format(parent = self.parent, 
-                            child = self.child, parent_type = type(self.parent)))
 
 

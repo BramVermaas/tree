@@ -2,6 +2,7 @@ import abc
 
 class AbstractTree(object):
     '''An interface that defines required methods for the Tree composite data structure'''
+    __metaclass__ = abc.ABCMeta
 
     @abc.abstractproperty
     def name(self):
@@ -34,4 +35,14 @@ class AbstractTree(object):
     @abc.abstractmethod
     def parent(self, parent):
         '''sets parent of tree'''
+        raise NotImplementedError
+        
+    @abc.abstractproperty
+    def default_traversal_order(self):
+        '''returns default traversal method used when getting children'''
+        raise NotImplementedError
+        
+    @abc.abstractproperty
+    def default_filter_order(self):
+        '''returns default filter order used when getting children'''
         raise NotImplementedError

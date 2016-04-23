@@ -10,6 +10,7 @@ class abstract_filter(object):
         self.kwargs = kwargs
 
     def filter(self, items):
+        #hoeft niet perse met een predicate en ifilter te zijn, want we hebben ook slice
         return itertools.ifilter(self.predicate, items)
 
     def is_applicable(self):
